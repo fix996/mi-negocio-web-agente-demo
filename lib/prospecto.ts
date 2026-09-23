@@ -25,19 +25,6 @@ export function validSearch(s: SearchSpec): boolean {
     s.count <= PLAN.maxBusinesses
   );
 }
-export function weekKey(date = new Date()): string {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Argentina/Buenos_Aires',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(date);
-  const get = (type: string) =>
-    Number(parts.find((p) => p.type === type)?.value);
-  const d = new Date(Date.UTC(get('year'), get('month') - 1, get('day')));
-  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
-  return d.toISOString().slice(0, 10);
-}
 export function createLeads(spec: SearchSpec, runId: string): Lead[] {
   const labels = [
     'Horizonte',
@@ -87,4 +74,10 @@ export function createLeads(spec: SearchSpec, runId: string): Lead[] {
     score: Math.max(62, 94 - i * 2),
     ...patterns[i % patterns.length],
   }));
+}
+
+/** Reserved .example domain: never invent a real phone or business identity in a demo. */
+export function demoContact(lead: Pick<Lead, 'name'>): string {
+  const slug = lead.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'negocio';
+  return 'contacto@' + slug + '.example';
 }

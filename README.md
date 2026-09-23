@@ -1,27 +1,38 @@
 # MI NEGOCIO WEB · Agente de clientes
 
-Demo pública para presentar a agencias de diseño y desarrollo web un servicio de búsqueda de oportunidades comerciales.
+[Probar demo pública](https://fix996.github.io/mi-negocio-web-agente-demo/)
 
-## Probar
+Dashboard para presentar a agencias web un servicio de búsqueda de oportunidades comerciales.
 
-Buscá, por ejemplo, «10 inmobiliarias en Córdoba». Personalizá la agencia, elegí el nombre del agente y explorá las fichas, los favoritos y el historial.
+## Experiencia
 
-**Es un prototipo:** los negocios y puntajes son ficticios. No consulta internet, no utiliza una API de IA, no envía mensajes y no cobra. El acceso con contraseña es ilustrativo y no autentica usuarios. No ingreses datos sensibles. El perfil y las búsquedas se guardan solo en tu navegador; no se comparten con otras agencias.
+- Un solo buscador: por ejemplo, «10 inmobiliarias en Córdoba».
+- Nombre del agente y perfil de agencia personalizables.
+- De 1 a 25 negocios por búsqueda; 10 recomendados para empezar a revisar.
+- Fichas, contactos ilustrativos copiables, guardados e historial. Sin exportación CSV.
+- Logo proporcionado por MI NEGOCIO WEB, presentado dentro de un círculo.
 
-## Propuesta piloto
+## Propuesta prepaga
 
-- Esencial: ARS 69.000/mes, 30 búsquedas de hasta 20 negocios analizados por búsqueda.
-- Configuración inicial del agente: ARS 49.000, una sola vez.
-- Opcional: 10 búsquedas extra por ARS 19.000, válidas en el ciclo vigente.
-- Cupo mensual no acumulable. Una consulta completada con resultados consume una búsqueda; se propone no descontar consultas fallidas o sin resultados.
-- La cantidad depende de la disponibilidad de negocios. Una oportunidad no garantiza interés, presupuesto ni una venta.
+Una búsqueda completada con resultados cuesta **ARS 3.000**, independientemente de la cantidad elegida (hasta 25 negocios). Reemplaza la propuesta anterior de abono mensual y configuración separada.
 
-Precios propuestos para validar el piloto, sin contratación ni cobros habilitados. El servicio real requiere cuentas privadas, verificación de fuentes, límites de consumo en servidor y medición de calidad y costos antes de su lanzamiento.
+- ARS 30.000 = 10 búsquedas, hasta 250 resultados en total.
+- ARS 100.000 = 33 búsquedas y ARS 1.000 de saldo restante.
+- Sin abono mensual; el saldo se conserva al cambiar el mes.
+- Recarga asistida: en el futuro servicio, MI NEGOCIO WEB acredita el saldo tras confirmar el pago.
+- Se propone no descontar búsquedas fallidas o sin resultados. Si hay menos negocios que los pedidos, una búsqueda con resultados consume el precio completo. Revisar y guardar fichas no consume saldo.
+- Más resultados pueden incluir coincidencias menos ajustadas; el número de búsquedas no degrada automáticamente la calidad. No se garantizan clientes interesados ni ventas. Puede haber coincidencias entre búsquedas.
+
+## Límites de esta demostración
+
+Los negocios, puntuaciones, contactos y dinero son ficticios. Los correos usan el dominio reservado .example y no sirven para contactar negocios reales. **No hay IA, búsqueda en internet, autenticación, pagos ni mensajes salientes.** No ingresar datos sensibles.
+
+El saldo inicial de ARS 30.000 permite probar la experiencia; el botón «Simular recarga» no cobra. Todos los cambios se guardan en este navegador. Se conservan los perfiles anteriores y se reemplaza el cupo mensual por una billetera de prueba independiente. Los límites locales no constituyen controles de facturación.
+
+Antes del servicio real faltan cuentas privadas, backend, acreditación administrativa, registro de pagos, separación entre agencias, control de gastos, fuentes verificadas y medición de calidad y costos.
 
 ## Desarrollo y publicación
 
-Node.js 22.13 o posterior. Ejecutar `npm ci`, `npm run dev` o `npm run build`.
+Node.js 22.13 o posterior. Ejecutar npm ci, npm run dev o npm run build.
 
-La compilación genera `docs/` para GitHub Pages. Publicar desde la rama `main`, carpeta `/docs`. El código fuente y la compilación están en este mismo repositorio. No contiene claves ni configuración de cuentas privadas.
-
-En la demo el contador se renueva el primer día del mes (hora argentina); en un servicio con cobros se renovaría con cada ciclo de suscripción. El contador local es ilustrativo, no un control de facturación.
+La compilación genera docs/. GitHub Pages publica desde main, carpeta /docs. No contiene claves ni credenciales. La tipografía Geist incluye su licencia en public/fonts/OFL.txt.

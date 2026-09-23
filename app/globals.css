@@ -130,9 +130,20 @@ button:hover:not(:disabled) {
 .brand-symbol {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 37px;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #111;
   color: #c9ab71;
+}
+.brand-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.55);
 }
 .brand-wordmark {
   font-size: 17px;
@@ -1610,4 +1621,51 @@ label textarea {
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Prepaid demo and lead contacts */
+.personal-mark { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; background: #111; border: 0; }
+.balance-inline { color: #806c47; background: none; border: 0; padding: 0; font: inherit; cursor: pointer; text-align: right; }
+.refill-link { margin: 18px auto 0; }
+.quantity-advice { margin: 0 0 18px; font-size: 12px; line-height: 1.8; color: #777064; text-align: left; }
+.quantity-advice strong { color: #896c37; font-weight: 500; }
+.wallet-card .price { margin-top: 25px; }
+.wallet-rate { display: flex; justify-content: space-between; gap: 12px; padding: 21px 0; margin-top: 21px; border-top: 1px solid #eae4d9; font-size: 14px; }
+.wallet-rate strong { color: #896d3c; font-weight: 500; }
+.recharge-form { margin-top: 25px; }
+.recharge-form > label { display: block; font-size: 13px; margin-bottom: 10px; color: #655b4a; }
+.amount-input { position: relative; }
+.amount-input > span { position: absolute; top: 15px; left: 14px; font-size: 12px; color: #9a8e78; }
+.amount-input input { width: 100%; padding: 12px 12px 12px 52px; border: 1px solid #ded8ce; border-radius: 8px; font-size: 17px; }
+.amount-options { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.amount-options button { flex: 1; padding: 9px 8px; border: 1px solid #e5dfd3; border-radius: 6px; background: white; color: #796d57; font-size: 12px; cursor: pointer; }
+.amount-options button[aria-pressed='true'] { background: #f7f1e7; border-color: #b79a62; color: #6f5424; }
+.recharge-preview { font-size: 13px; line-height: 1.8; margin: 16px 0 20px; color: #7c6d56; min-height: 45px; }
+.recharge-preview strong { color: #3b352b; font-weight: 500; }
+.recharge-examples { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; margin: 23px 0 29px; }
+.recharge-examples > div { display: grid; gap: 6px; padding: 15px; background: #f8f6f1; border-radius: 8px; }
+.recharge-examples span { font-size: 14px; color: #897247; }
+.recharge-examples strong { font-size: 15px; font-weight: 500; }
+.recharge-examples small { font-size: 11px; line-height: 1.7; color: #827762; }
+.wallet-rules { list-style: none; padding: 0; margin: 22px 0; display: grid; gap: 13px; }
+.wallet-rules li { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; line-height: 1.7; color: #73664f; }
+.wallet-rules svg { margin-top: 3px; color: #a38751; }
+.manual-topup-note { padding: 18px; margin-top: 24px; border: 1px solid #eee7db; border-radius: 8px; }
+.manual-topup-note > strong { font-size: 13px; font-weight: 500; }
+.manual-topup-note p { margin-top: 8px; font-size: 12px; }
+.contact-link { display: inline-flex; align-items: center; gap: 7px; color: #816635; font-size: 12px; white-space: nowrap; cursor: pointer; padding: 7px 0; }
+.contact-card { margin: 24px 0; padding: 20px; border: 1px solid #e5dac5; border-radius: 10px; background: #fcfaf6; }
+.contact-heading { display: flex; align-items: center; gap: 9px; color: #9a7b3d; margin-bottom: 20px; }
+.contact-heading h3 { margin: 0; font-size: 15px; color: #2b2925; }
+.contact-heading > span { margin-left: auto; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.contact-label { font-size: 11px; color: #8c7d64; }
+.contact-email { font-size: 16px; color: #292620; margin: 6px 0 18px; overflow-wrap: anywhere; user-select: all; }
+.contact-disclaimer { font-size: 11px; line-height: 1.8; color: #887b66; margin-top: 14px; }
+@media (max-width: 767px) {
+  .personal-mark { width: 56px; height: 56px; border-radius: 50%; }
+  .search-context { align-items: flex-start; gap: 16px; }
+  .search-context > span { max-width: 40%; }
+  .balance-inline { max-width: 58%; line-height: 1.7; }
+  .recharge-examples { grid-template-columns: 1fr; }
+  .contact-card { padding: 16px; }
 }

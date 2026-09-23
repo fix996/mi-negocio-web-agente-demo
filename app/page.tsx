@@ -7,15 +7,16 @@ import {
   type CSSProperties,
 } from 'react';
 import {
-  ArrowDownToLine,
   ArrowRight,
-  ArrowUp,
   Bookmark,
   Building2,
   Check,
   ChevronRight,
   CircleHelp,
   CreditCard,
+  Mail,
+  Copy,
+  Wallet,
   Globe,
   History,
   Camera,
@@ -55,7 +56,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { Progress } from '@/components/ui/progress';
 import {
   Table,
   TableBody,
@@ -66,12 +66,13 @@ import {
 } from '@/components/ui/table';
 import {
   createLeads,
+  demoContact,
   validSearch,
   type Lead,
   type SearchSpec,
 } from '@/lib/prospecto';
 
-import { PLAN, ars, monthKey } from '@/lib/plan';
+import { PLAN, ars, availableSearches, validTopUp, spendSearch, type WalletState } from '@/lib/plan';
 
 type View = 'agent' | 'leads' | 'history' | 'agency' | 'plan';
 type Profile = {
@@ -82,7 +83,6 @@ type Profile = {
   ideal: string;
   agentName: string;
 };
-type Message = { role: 'agent' | 'user'; text: string };
 type Run = SearchSpec & { id: string; date: string; leads: Lead[] };
 const KEY = 'prospecto-prototype-v1';
 const initialProfile: Profile = {
@@ -103,21 +103,21 @@ const nav = [
   { id: 'leads', label: 'Mis leads', icon: Target },
   { id: 'history', label: 'Mis búsquedas', icon: History },
   { id: 'agency', label: 'Mi agencia', icon: Building2 },
-  { id: 'plan', label: 'Mi plan', icon: CreditCard },
+  { id: 'plan', label: 'Mi saldo', icon: Wallet },
 ] as const;
 
 function Nav({
   view,
   go,
   profile,
-  used,
+  balance,
   saved,
   showAccess,
 }: {
   view: View;
   go: (v: View) => void;
   profile: Profile;
-  used: number;
+  balance: number;
   saved: number;
   showAccess: () => void;
 }) {
@@ -131,7 +131,7 @@ function Nav({
       <SidebarHeader className="side-head">
         <div className="brand">
           <span className="brand-symbol">
-            <Radar size={24} />
+            <BrandLogo />
           </span>
           <span className="brand-wordmark">
             MI NEGOCIO
@@ -179,10 +179,10 @@ function Nav({
       <SidebarFooter className="side-footer">
         <button className="quota-card" onClick={() => navigate('plan')}>
           <span>
-            Plan Esencial <ChevronRight size={14} />
+            Mi saldo de prueba <ChevronRight size={14} />
           </span>
           <strong>
-            {Math.max(0, PLAN.searches - used)} de {PLAN.searches} <small>búsquedas este mes</small>
+            {ars(balance)} <small>{availableSearches(balance)} búsquedas disponibles</small>
           </strong>
         </button>
         <button className="user-menu" onClick={showAccess}>
@@ -205,18 +205,12 @@ export default function Home() {
   const [profile, setProfile] = useState(initialProfile);
   const [draft, setDraft] = useState(initialProfile);
   const [spec, setSpec] = useState(initialSpec);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'agent',
-      text: '¡Hola! Soy tu agente de búsqueda. Contame qué negocios querés encontrar, en qué lugar y cuántos. También podés usar los campos de abajo.',
-    },
-  ]);
   const [input, setInput] = useState('');
-  const [chatInput, setChatInput] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [runs, setRuns] = useState<Run[]>([]);
   const [saved, setSaved] = useState<string[]>([]);
-  const [quota, setQuota] = useState({ month: '', used: 0 });
+  const [wallet, setWallet] = useState<WalletState>({ balance: PLAN.demoBalance, spent: 0 });
+  const [topUpInput, setTopUpInput] = useState('30000');
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState(0);
@@ -225,14 +219,13 @@ export default function Home() {
   const [filter, setFilter] = useState('all');
   const [notice, setNotice] = useState('');
   const [access, setAccess] = useState(false);
-  const chatEnd = useRef<HTMLDivElement>(null);
   const runLock = useRef(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const used = quota.month === monthKey() ? quota.used : 0;
+  const remaining = availableSearches(wallet.balance);
+  const topUpAmount = Number(topUpInput);
   const allLeads = runs.flatMap((r) => r.leads);
   const currentRun = runs.find((r) => r.id === activeRun) ?? runs[0];
   const shown = currentRun?.leads ?? [];
-  const agentName = profile.agentName.trim() || 'Tu agente';
   const visibleLeads = allLeads.filter(
     (l) => filter === 'all' || saved.includes(l.id),
   );
@@ -280,13 +273,10 @@ export default function Home() {
           );
         if (Array.isArray(d.saved))
           setSaved(d.saved.filter((s: unknown) => typeof s === 'string'));
-        if (
-          d.quota?.month === monthKey() &&
-          Number.isInteger(d.quota.used) &&
-          d.quota.used >= 0 &&
-          d.quota.used <= PLAN.searches
-        )
-          setQuota(d.quota);
+        // Only a validated prepaid wallet is restored; old monthly quotas do not become money.
+        if (d.wallet && Number.isSafeInteger(d.wallet.balance) && d.wallet.balance >= 0 && d.wallet.balance <= PLAN.maxBalance && Number.isSafeInteger(d.wallet.spent) && d.wallet.spent >= 0) {
+          setWallet(d.wallet);
+        }
       }
     } catch {
       /* Demo remains usable without storage. */
@@ -301,26 +291,20 @@ export default function Home() {
     try {
       localStorage.setItem(
         KEY,
-        JSON.stringify({ profile, runs, saved, quota }),
+        JSON.stringify({ profile, runs, saved, wallet }),
       );
     } catch {
       setNotice(
         'No se pudo guardar en este navegador. Podés seguir probando durante esta sesión.',
       );
     }
-  }, [profile, runs, saved, quota, ready]);
+  }, [profile, runs, saved, wallet, ready]);
   /* oxlint-enable react/react-compiler */
-  useEffect(() => {
-    if (messages.length > 1)
-      chatEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, [messages, busy]);
   useEffect(() => {
     if (!notice) return;
     const t = setTimeout(() => setNotice(''), 5500);
     return () => clearTimeout(t);
   }, [notice]);
-  const add = (role: Message['role'], text: string) =>
-    setMessages((m) => [...m, { role, text }]);
   const toggleSave = (id: string) =>
     setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   function search(request: SearchSpec = spec) {
@@ -331,11 +315,8 @@ export default function Home() {
       );
       return;
     }
-    if (used >= PLAN.searches) {
-      add(
-        'agent',
-        `Usaste las ${PLAN.searches} búsquedas de este mes de prueba. Podés revisar tus leads; el cupo se renueva el primer día del mes siguiente.`,
-      );
+    if (remaining < 1) {
+      setNotice('No alcanza tu saldo. Entrá a Mi saldo para simular una recarga.');
       return;
     }
     runLock.current = true;
@@ -343,10 +324,6 @@ export default function Home() {
     setShowResults(true);
     setStage(0);
     setView('agent');
-    add(
-      'user',
-      `Buscá ${request.count} ${request.industry.toLowerCase()} en ${request.place}.`,
-    );
     const snapshot = { ...request };
     let step = 0;
     timer.current = setInterval(() => {
@@ -363,78 +340,12 @@ export default function Home() {
         };
         setRuns((r) => [run, ...r].slice(0, 30));
         setActiveRun(id);
-        setQuota((q) => ({
-          month: monthKey(),
-          used: (q.month === monthKey() ? q.used : 0) + 1,
-        }));
-        add(
-          'agent',
-          `Listo: preparé ${snapshot.count} ejemplos de ${snapshot.industry.toLowerCase()} en ${snapshot.place}. Abrí cada ficha para ver la oportunidad. Son negocios ficticios: esta prueba no consultó internet.`,
-        );
+        setWallet((current) => spendSearch(current));
+        setNotice('Búsqueda de ejemplo completada. Se descontaron ' + ars(PLAN.searchArs) + ' del saldo de prueba.');
         setBusy(false);
         runLock.current = false;
       }
     }, 750);
-  }
-  function send(e: SyntheticEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const text = chatInput.trim();
-    if (!text || busy) return;
-    setChatInput('');
-    if (/^(s[ií]|dale|empez[aá]|buscar|vamos)[.!\s]*$/i.test(text)) {
-      search();
-      return;
-    }
-    add('user', text);
-    const lower = text.toLowerCase();
-    if (/precio|plan|cu[aá]nto cuesta/.test(lower)) {
-      add(
-        'agent',
-        `La propuesta Esencial es ${ars(PLAN.monthlyArs)} ARS por mes: ${PLAN.searches} búsquedas de hasta ${PLAN.maxBusinesses} negocios. Configuración inicial: ${ars(PLAN.setupArs)} una sola vez. Esta demo no cobra ni busca negocios reales.`,
-      );
-      return;
-    }
-    if (/mi agencia|mi negocio|me llamo|configur/.test(lower)) {
-      add(
-        'agent',
-        'Contame sobre tu agencia en “Mi agencia”: tu nombre, qué vendés y qué clientes buscás. Voy a guardar esas preferencias en esta demo.',
-      );
-      return;
-    }
-    const industry = [
-      ['inmobiliari', 'Inmobiliarias'],
-      ['restauran', 'Restaurantes'],
-      ['odont', 'Clínicas odontológicas'],
-      ['automotor', 'Concesionarias'],
-      ['concesion', 'Concesionarias'],
-      ['gimnas', 'Gimnasios'],
-      ['hotel', 'Hoteles'],
-    ].find(([key]) => lower.includes(key))?.[1];
-    const number = text.match(/\b(\d+)\b/);
-    const place = text.match(/\ben\s+(.+?)(?:[.!?]|$)/i)?.[1]?.trim();
-    if (industry || number || place) {
-      const next = {
-        industry: industry ?? spec.industry,
-        place: place ?? spec.place,
-        count: number ? Number(number[1]) : spec.count,
-      };
-      if (!validSearch(next)) {
-        add(
-          'agent',
-          `Para esta prueba podés pedir entre 1 y ${PLAN.maxBusinesses} negocios. Ajustá los campos de abajo para continuar.`,
-        );
-        return;
-      }
-      setSpec(next);
-      add(
-        'agent',
-        `La búsqueda quedaría así: ${next.count} ${next.industry.toLowerCase()} en ${next.place}. Revisá los campos y tocá “Buscar leads”. Descontaría 1 búsqueda de tu plan.`,
-      );
-    } else
-      add(
-        'agent',
-        'En esta demo puedo preparar pedidos como “10 inmobiliarias en Córdoba”. También podés usar los campos de abajo. La conversación con IA real se conectará después.',
-      );
   }
   function saveProfile(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -448,42 +359,25 @@ export default function Home() {
     setProfile(clean);
     setDraft(clean);
     setSpec((s) => ({ ...s, place: clean.area }));
-    add(
-      'agent',
-      `Ya actualicé tu perfil, ${clean.owner}. Tu agencia es ${clean.name}, ofrece ${clean.service.toLowerCase()} y busca clientes en ${clean.area}. ¿Qué negocios buscamos primero?`,
-    );
     setNotice('Perfil guardado en este navegador.');
     setView('agent');
   }
-  function exportLeads() {
-    const safe = (v: string) =>
-      '"' + (/^[=+@\-\t\r]/.test(v) ? "'" : '') + v.replaceAll('"', '""') + '"';
-    const rows = [
-      [
-        'Nombre (ficticio)',
-        'Rubro',
-        'Zona',
-        'Encaje de ejemplo',
-        'Oportunidad',
-      ],
-      ...visibleLeads.map((l) => [
-        l.name,
-        l.industry,
-        l.place,
-        String(l.score),
-        l.reason,
-      ]),
-    ];
-    const blob = new Blob(
-      ['\ufeff' + rows.map((r) => r.map(safe).join(';')).join('\r\n')],
-      { type: 'text/csv;charset=utf-8;' },
-    );
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'mi-negocio-web-leads-de-ejemplo.csv';
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  function topUp(e: SyntheticEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!ready || busy || !validTopUp(topUpAmount, wallet.balance)) {
+      setNotice('Ingresá un importe entero desde ' + ars(PLAN.minTopUp) + ', sin superar ' + ars(PLAN.maxBalance) + ' de saldo de prueba.');
+      return;
+    }
+    setWallet((current) => ({ ...current, balance: current.balance + topUpAmount }));
+    setNotice('Sumaste ' + ars(topUpAmount) + ' ficticios. No se realizó ningún pago.');
+  }
+  async function copyContact(lead: Lead) {
+    try {
+      await navigator.clipboard.writeText(demoContact(lead));
+      setNotice('Correo de ejemplo copiado. No pertenece a un negocio real.');
+    } catch {
+      setNotice('No se pudo copiar. Podés seleccionar el correo en la ficha.');
+    }
   }
 
   if (access)
@@ -492,7 +386,7 @@ export default function Home() {
         <div className="access-story">
           <div className="brand">
             <span className="brand-symbol">
-              <Radar />
+              <BrandLogo />
             </span>
             <span className="brand-wordmark">
               MI NEGOCIO
@@ -561,7 +455,7 @@ export default function Home() {
         view={view}
         go={setView}
         profile={profile}
-        used={used}
+        balance={wallet.balance}
         saved={saved.length}
         showAccess={() => setAccess(true)}
       />
@@ -601,7 +495,7 @@ export default function Home() {
                 aria-label="Buscador de clientes"
               >
                 <div className="personal-mark">
-                  <Sparkles size={27} strokeWidth={1.3} />
+                  <BrandLogo />
                 </div>
                 <button
                   className="agent-name-button"
@@ -665,7 +559,7 @@ export default function Home() {
                       </span>
                       <button
                         className="primary"
-                        disabled={busy || used >= PLAN.searches || !ready}
+                        disabled={busy || remaining < 1 || !ready}
                       >
                         {busy ? (
                           <LoaderCircle className="spin" size={17} />
@@ -674,8 +568,8 @@ export default function Home() {
                         )}{' '}
                         {busy
                           ? 'Buscando…'
-                          : used >= PLAN.searches
-                            ? 'Cupo agotado'
+                          : remaining < 1
+                            ? 'Recargá tu saldo'
                             : 'Buscar'}
                       </button>
                     </div>
@@ -737,9 +631,10 @@ export default function Home() {
                           />
                         </label>
                       </div>
+                      <p className="quantity-advice"><strong>{PLAN.recommendedBusinesses} recomendados</strong> · Máximo {PLAN.maxBusinesses} negocios. Pedir más puede incluir coincidencias menos ajustadas.</p>
                       <button
                         className="secondary"
-                        disabled={busy || used >= PLAN.searches || !ready}
+                        disabled={busy || remaining < 1 || !ready}
                       >
                         Buscar con estos datos <ArrowRight size={15} />
                       </button>
@@ -751,8 +646,9 @@ export default function Home() {
                     <Building2 size={13} />
                     {profile.name}
                   </span>
-                  <span>1 búsqueda de tu plan</span>
+                  <button className="balance-inline" onClick={() => setView('plan')}>{ars(PLAN.searchArs)} por búsqueda · Saldo: {ars(wallet.balance)}</button>
                 </div>
+                {remaining < 1 && !busy && <button className="text-btn refill-link" onClick={() => setView('plan')}>Recargar saldo de prueba <ArrowRight size={14} /></button>}
                 {busy && (
                   <output className="search-progress">
                     <LoaderCircle className="spin" size={16} />
@@ -789,7 +685,7 @@ export default function Home() {
                           </span>
                           <span>
                             <strong>{lead.name}</strong>
-                            <small>{lead.signal}</small>
+                            <small>{lead.signal} · Ver contacto</small>
                           </span>
                           <span className="score">{lead.score}/100</span>
                           <ChevronRight size={17} />
@@ -807,48 +703,6 @@ export default function Home() {
                     </button>
                   </section>
                 )}
-                <details className="agent-conversation">
-                  <summary>
-                    Hablar con{' '}
-                    {agentName === 'Tu agente' ? 'mi agente' : agentName}
-                    <ChevronRight size={14} />
-                  </summary>
-                  <div
-                    className="chat-messages"
-                    role="log"
-                    aria-label="Conversación de demostración"
-                    aria-live="polite"
-                  >
-                    {messages.slice(-6).map((m, i) => (
-                      <div className={'message ' + m.role} key={i}>
-                        <strong>
-                          {m.role === 'agent' ? agentName : profile.owner}
-                        </strong>
-                        <p>{m.text}</p>
-                      </div>
-                    ))}
-                    <div ref={chatEnd} />
-                  </div>
-                  <form className="composer" onSubmit={send}>
-                    <label className="sr-only" htmlFor="chat-input">
-                      Mensaje para tu agente
-                    </label>
-                    <input
-                      id="chat-input"
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      placeholder="Escribile a tu agente…"
-                      maxLength={500}
-                      disabled={busy}
-                    />
-                    <button
-                      aria-label="Enviar mensaje"
-                      disabled={!chatInput.trim() || busy}
-                    >
-                      <ArrowUp size={17} />
-                    </button>
-                  </form>
-                </details>
                 <p className="prototype-note">
                   Vista de prueba · todavía no se realizan búsquedas reales.
                 </p>
@@ -881,14 +735,6 @@ export default function Home() {
                   </SelectContent>
                 </Select>
                 <span>{visibleLeads.length} negocios de ejemplo</span>
-                <button
-                  className="secondary"
-                  disabled={!visibleLeads.length}
-                  onClick={exportLeads}
-                >
-                  <ArrowDownToLine size={16} />
-                  Exportar CSV
-                </button>
               </div>
               {visibleLeads.length ? (
                 <div className="table-panel">
@@ -899,6 +745,7 @@ export default function Home() {
                         <TableHead>Zona</TableHead>
                         <TableHead>Encaje de ejemplo</TableHead>
                         <TableHead>Oportunidad</TableHead>
+                        <TableHead>Contacto</TableHead>
                         <TableHead>
                           <span className="sr-only">Acciones</span>
                         </TableHead>
@@ -922,6 +769,9 @@ export default function Home() {
                           </TableCell>
                           <TableCell className="reason-cell">
                             {l.reason}
+                          </TableCell>
+                          <TableCell>
+                            <button className="contact-link" onClick={() => setSelected(l)}><Mail size={15} /> Ver contacto</button>
                           </TableCell>
                           <TableCell>
                             <button
@@ -1041,7 +891,7 @@ export default function Home() {
                       placeholder="Elegí un nombre, por ejemplo: Milo"
                     />
                     <span className="field-note">
-                      Este nombre aparece en tu buscador y en la conversación.
+                      Este nombre aparece en tu buscador y en tu espacio de trabajo.
                     </span>
                   </label>
                   <div className="two-fields">
@@ -1132,84 +982,41 @@ export default function Home() {
           )}
           {view === 'plan' && (
             <>
-              <PageHeading
-                eyebrow="SIMPLE Y A TU RITMO"
-                title="Un plan para empezar"
-                description="Una propuesta simple para encontrar oportunidades para tu agencia."
-              />
+              <PageHeading eyebrow="VOS ELEGÍS CUÁNTO" title="Tu saldo, a tu ritmo" description="Recargá cuando lo necesites y usá tu saldo para buscar. Sin abono mensual." />
               <div className="plan-grid">
-                <section className="pricing-card">
-                  <div className="pricing-top">
-                    <span className="small-pill blue">PROPUESTA PILOTO</span>
-                    <Radar size={28} />
-                  </div>
-                  <h2>Esencial</h2>
-                  <p>Para agencias de diseño y desarrollo web.</p>
-                  <div className="price">
-                    {ars(PLAN.monthlyArs)} <span>ARS / mes</span>
-                  </div>
-                  <div className="price-note">
-                    Configuración inicial: {ars(PLAN.setupArs)} ARS, una sola vez.
-                  </div>
-                  <ul>
-                    <li>
-                      <Check />{PLAN.searches} búsquedas por mes
-                    </li>
-                    <li>
-                      <Check />
-                      Hasta {PLAN.maxBusinesses} negocios analizados por búsqueda
-                    </li>
-                    <li>
-                      <Check />
-                      Rubro y ubicación a elección
-                    </li>
-                    <li>
-                      <Check />
-                      Agente personalizado para tu agencia
-                    </li>
-                    <li>
-                      <Check />
-                      Historial y leads guardados
-                    </li>
-                  </ul>
-                  <button
-                    className="primary full"
-                    onClick={() => setView('agent')}
-                  >
-                    Probar una búsqueda <ArrowRight size={17} />
-                  </button>
-                  <p className="price-note">Demo gratuita con datos ficticios. Servicio real en preparación; sin cobros habilitados.</p>
+                <section className="pricing-card wallet-card">
+                  <div className="pricing-top"><span className="small-pill">SALDO DE PRUEBA</span><Wallet size={24} /></div>
+                  <div className="price">{ars(wallet.balance)} <span>ARS</span></div>
+                  <p>Disponible para <strong>{remaining} búsquedas</strong>.</p>
+                  <div className="wallet-rate"><span>Una búsqueda</span><strong>{ars(PLAN.searchArs)} ARS</strong></div>
+                  <p>Hasta {PLAN.maxBusinesses} negocios por búsqueda. Recomendamos empezar con {PLAN.recommendedBusinesses}.</p>
+                  <form className="recharge-form" onSubmit={topUp}>
+                    <label htmlFor="top-up">¿Cuánto querés recargar?</label>
+                    <div className="amount-input"><span>ARS</span><input id="top-up" type="number" min={PLAN.minTopUp} max={PLAN.maxBalance} step={1} value={topUpInput} onChange={(e) => setTopUpInput(e.target.value)} required disabled={busy || !ready} /></div>
+                    <div className="amount-options">
+                      {[15000, 30000, 100000].map((amount) => <button type="button" key={amount} aria-pressed={topUpAmount === amount} onClick={() => setTopUpInput(String(amount))} disabled={busy}>{ars(amount)}</button>)}
+                    </div>
+                    <p className="recharge-preview" aria-live="polite">{validTopUp(topUpAmount, wallet.balance) ? <><strong>{availableSearches(topUpAmount)} búsquedas</strong> con esta recarga{topUpAmount % PLAN.searchArs ? ' + ' + ars(topUpAmount % PLAN.searchArs) + ' de saldo restante' : ''}.</> : 'Ingresá un importe válido desde ' + ars(PLAN.minTopUp) + '.'}</p>
+                    <button className="primary full" disabled={!ready || busy || !validTopUp(topUpAmount, wallet.balance)}><CreditCard size={17} /> Simular recarga</button>
+                  </form>
+                  <p className="price-note">Solo dinero ficticio. No se solicita ni procesa ningún pago.</p>
                 </section>
                 <section className="surface plan-explainer">
-                  <h2>¿Qué cuenta como una búsqueda?</h2>
-                  <p>
-                    Un pedido con un tipo de negocio, una ubicación y una
-                    cantidad. Por ejemplo:
-                  </p>
-                  <div className="request-example">
-                    “Buscá 10 inmobiliarias en Córdoba”.
+                  <h2>Una búsqueda, un precio claro.</h2>
+                  <p>Elegís el rubro, la zona y entre 1 y {PLAN.maxBusinesses} negocios. Cada búsqueda completada con resultados cuesta <strong>{ars(PLAN.searchArs)}</strong>, independientemente de la cantidad elegida.</p>
+                  <div className="recharge-examples">
+                    <div><span>{ars(30000)}</span><strong>10 búsquedas</strong><small>Hasta {10 * PLAN.maxBusinesses} resultados en total</small></div>
+                    <div><span>{ars(100000)}</span><strong>33 búsquedas</strong><small>+ {ars(1000)} que quedan en tu saldo</small></div>
                   </div>
-                  <p>
-                    Un pedido completado con resultados descuenta{' '}
-                    <strong>1 búsqueda</strong>. Chatear, revisar fichas y
-                    guardar leads no descuenta búsquedas.
-                  </p>
-                  <p><strong>¿Necesitás más?</strong> {PLAN.extraSearches} búsquedas extra por {ars(PLAN.extraArs)} ARS, a pedido y válidas durante el ciclo vigente.</p>
-                  <div className="usage-details">
-                    <div>
-                      <span>Usadas este mes en la demo</span>
-                      <strong>{used} de {PLAN.searches}</strong>
-                    </div>
-                    <Progress locale="es-AR" value={(used / PLAN.searches) * 100} />
-                    <span>
-                      En la demo, el cupo se renueva el primer día de cada mes.
-                      En el servicio, con cada renovación mensual. No se acumula.
-                    </span>
-                  </div>
-                  <div className="muted-note">
-                    Propuesta: si una búsqueda falla o no encuentra negocios, no consume cupo.
-                    Los resultados dependen del rubro y la zona; no son ventas garantizadas.
-                  </div>
+                  <h2>Empezá con {PLAN.recommendedBusinesses} negocios.</h2>
+                  <p>Es una cantidad práctica para revisar cada oportunidad. Pedir más puede incluir coincidencias menos ajustadas; hacer más búsquedas no reduce por sí solo la calidad.</p>
+                  <ul className="wallet-rules">
+                    <li><Check size={15} />El saldo no vence al terminar el mes.</li>
+                    <li><Check size={15} />Si la búsqueda falla o no encuentra negocios, no se descuenta saldo.</li>
+                    <li><Check size={15} />Revisar fichas y guardar leads no tiene costo.</li>
+                  </ul>
+                  <p className="muted-note">La cantidad depende de los negocios disponibles. Los resultados pueden repetirse entre búsquedas: no equivalen a clientes nuevos ni a ventas garantizadas.</p>
+                  <div className="manual-topup-note"><strong>Recarga asistida</strong><p>En el servicio real, MI NEGOCIO WEB acredita el saldo al confirmar tu pago. Esta pantalla permite probar cómo funcionaría.</p></div>
                 </section>
               </div>
             </>
@@ -1252,6 +1059,13 @@ export default function Home() {
                 <p className="muted-note">
                   Puntaje ilustrativo. No representa la probabilidad de venta.
                 </p>
+                <section className="contact-card" aria-label="Contacto del negocio">
+                  <div className="contact-heading"><Mail size={19} /><h3>Contacto del negocio</h3><span>Ejemplo</span></div>
+                  <span className="contact-label">Correo electrónico ilustrativo</span>
+                  <p className="contact-email">{demoContact(selected)}</p>
+                  <button className="secondary full" onClick={() => copyContact(selected)}><Copy size={16} /> Copiar correo de ejemplo</button>
+                  <p className="contact-disclaimer">Negocio ficticio: este correo no recibe mensajes. En el servicio real, acá verás teléfono, WhatsApp, correo o red social cuando se pueda verificar.</p>
+                </section>
                 <h3>¿Por qué podría interesarte?</h3>
                 <p>{selected.reason}</p>
                 <h3>Presencia digital</h3>
@@ -1277,8 +1091,8 @@ export default function Home() {
                     <strong>Falta confirmar</strong>
                     <p>
                       Presupuesto, interés en contratar y persona que decide.
-                      Las fuentes y los contactos aparecerán cuando conectemos
-                      la búsqueda real.
+                      Los contactos reales y sus fuentes aparecerán cuando conectemos
+                      la búsqueda.
                     </p>
                   </div>
                 </div>
@@ -1366,4 +1180,8 @@ function Empty({
       </button>
     </div>
   );
+}
+
+function BrandLogo() {
+  return <img className="brand-logo" src={import.meta.env.BASE_URL + 'logo-mi-negocio-web.png'} alt="MI NEGOCIO WEB" width={64} height={64} />;
 }
