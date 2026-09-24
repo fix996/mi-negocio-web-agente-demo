@@ -12,8 +12,8 @@ export function AgencyIntro({ onSearch, onProfile, onBalance }: {
       <div className="intro-hero">
         <div className="intro-copy">
           <h1>Encontrá los próximos<br className="intro-break" /> clientes de <span>tu agencia.</span></h1>
-          <p className="intro-lead">Tu propio agente de IA, pensado para encontrar negocios que podrían necesitar una página web o mejorar la que ya tienen.</p>
-          <p className="intro-purpose">Un servicio para ayudarte a conseguir clientes para los servicios de diseño y desarrollo web que vos ofrecés.</p>
+          <p className="intro-lead">Tu propio agente de IA privado, especializado en encontrar leads para tu agencia.</p>
+          <p className="intro-purpose">Pensado para detectar negocios que podrían necesitar una página web o mejorar la que ya tienen. Configurado según tus servicios, tu cliente ideal y la zona donde querés conseguir clientes.</p>
           <div className="intro-actions">
             <button className="primary" onClick={onSearch}>Probar mi agente <ArrowRight size={17} /></button>
             <button className="text-btn" onClick={onProfile}>Personalizar mi agencia <SlidersHorizontal size={15} /></button>
@@ -40,7 +40,7 @@ export function AgencyIntro({ onSearch, onProfile, onBalance }: {
       </section>
 
       <div className="intro-service-notes">
-        <div><LockKeyhole size={18} /><p><strong>Un espacio propio para cada agencia</strong><span>El servicio prevé una cuenta privada con su agente, preferencias e historial.</span></p></div>
+        <div><LockKeyhole size={18} /><p><strong>Tu agente. Tu espacio privado.</strong><span>El servicio prevé una cuenta con acceso exclusivo para tu agencia, con su propio agente, preferencias e historial.</span></p></div>
         <div><MapPin size={18} /><p><strong>Pensado para buscar en toda Argentina</strong><span>Vos elegís la zona. La cantidad y calidad dependen de la información disponible.</span></p></div>
       </div>
 
