@@ -1,10 +1,10 @@
 /** Propuesta prepaga; esta demo solo maneja saldo ficticio. */
 export const PLAN = {
-  searchArs: 3000,
+  searchArs: 5000,
   maxBusinesses: 25,
   recommendedBusinesses: 10,
   demoBalance: 30000,
-  minTopUp: 3000,
+  minTopUp: 5000,
   maxBalance: 1000000,
 } as const;
 export type WalletState = { balance: number; spent: number };

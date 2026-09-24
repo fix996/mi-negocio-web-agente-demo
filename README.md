@@ -16,10 +16,10 @@ Dashboard para presentar a agencias web un servicio de búsqueda de oportunidade
 
 ## Propuesta prepaga
 
-Una búsqueda completada con resultados cuesta **ARS 3.000**, independientemente de la cantidad elegida (hasta 25 negocios). Reemplaza la propuesta anterior de abono mensual y configuración separada.
+Una búsqueda completada con resultados cuesta **ARS 5.000**, independientemente de la cantidad elegida (hasta 25 negocios). Reemplaza la propuesta anterior de abono mensual y configuración separada. La recarga mínima es de ARS 5.000.
 
-- ARS 30.000 = 10 búsquedas, hasta 250 resultados en total.
-- ARS 100.000 = 33 búsquedas y ARS 1.000 de saldo restante.
+- ARS 30.000 = 6 búsquedas, hasta 150 resultados en total.
+- ARS 100.000 = 20 búsquedas, hasta 500 resultados en total.
 - Sin abono mensual; el saldo se conserva al cambiar el mes.
 - Recarga asistida: en el futuro servicio, MI NEGOCIO WEB acredita el saldo tras confirmar el pago.
 - Se propone no descontar búsquedas fallidas o sin resultados. Si hay menos negocios que los pedidos, una búsqueda con resultados consume el precio completo. Revisar y guardar fichas no consume saldo.

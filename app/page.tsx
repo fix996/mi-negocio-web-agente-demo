@@ -1014,8 +1014,7 @@ export default function Home() {
                   <h2>Una búsqueda, un precio claro.</h2>
                   <p>Elegís el rubro, la zona y entre 1 y {PLAN.maxBusinesses} negocios. Cada búsqueda completada con resultados cuesta <strong>{ars(PLAN.searchArs)}</strong>, independientemente de la cantidad elegida.</p>
                   <div className="recharge-examples">
-                    <div><span>{ars(30000)}</span><strong>10 búsquedas</strong><small>Hasta {10 * PLAN.maxBusinesses} resultados en total</small></div>
-                    <div><span>{ars(100000)}</span><strong>33 búsquedas</strong><small>+ {ars(1000)} que quedan en tu saldo</small></div>
+                    {[30000, 100000].map((amount) => <div key={amount}><span>{ars(amount)}</span><strong>{availableSearches(amount)} búsquedas</strong><small>Hasta {availableSearches(amount) * PLAN.maxBusinesses} resultados en total{amount % PLAN.searchArs ? ' · ' + ars(amount % PLAN.searchArs) + ' de saldo restante' : ''}</small></div>)}
                   </div>
                   <h2>Empezá con {PLAN.recommendedBusinesses} negocios.</h2>
                   <p>Es una cantidad práctica para revisar cada oportunidad. Pedir más puede incluir coincidencias menos ajustadas; hacer más búsquedas no reduce por sí solo la calidad.</p>
