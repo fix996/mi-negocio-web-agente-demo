@@ -6,6 +6,8 @@ Dashboard para presentar a agencias web un servicio de búsqueda de oportunidade
 
 ## Experiencia
 
+- «Tu espacio» abre con una presentación del servicio para que las agencias encuentren clientes para sus propios servicios web: personalización, búsqueda por rubro y zona de Argentina, y oportunidades con contexto.
+- Ejemplo ficticio de oportunidad y explicación clara de las funciones propuestas frente a lo que esta demo permite probar.
 - Un solo buscador: por ejemplo, «10 inmobiliarias en Córdoba».
 - Nombre del agente y perfil de agencia personalizables.
 - De 1 a 25 negocios por búsqueda; 10 recomendados para empezar a revisar.

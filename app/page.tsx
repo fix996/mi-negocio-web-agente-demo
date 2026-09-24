@@ -19,6 +19,7 @@ import {
   Wallet,
   Globe,
   History,
+  House,
   Camera,
   LoaderCircle,
   LockKeyhole,
@@ -73,8 +74,9 @@ import {
 } from '@/lib/prospecto';
 
 import { PLAN, ars, availableSearches, validTopUp, spendSearch, type WalletState } from '@/lib/plan';
+import { AgencyIntro } from '@/components/agency-intro';
 
-type View = 'agent' | 'leads' | 'history' | 'agency' | 'plan';
+type View = 'home' | 'agent' | 'leads' | 'history' | 'agency' | 'plan';
 type Profile = {
   name: string;
   owner: string;
@@ -99,6 +101,7 @@ const initialSpec: SearchSpec = {
   count: 10,
 };
 const nav = [
+  { id: 'home', label: 'Tu espacio', icon: House },
   { id: 'agent', label: 'Mi agente', icon: Sparkles },
   { id: 'leads', label: 'Mis leads', icon: Target },
   { id: 'history', label: 'Mis búsquedas', icon: History },
@@ -142,7 +145,7 @@ function Nav({
         <span className="brand-caption">AGENTE DE CLIENTES</span>
       </SidebarHeader>
       <SidebarContent className="side-content">
-        <button className="workspace" onClick={() => navigate('agency')}>
+        <button className="workspace" onClick={() => navigate('home')}>
           <span className="agency-monogram">
             {profile.name.slice(0, 1).toUpperCase()}
           </span>
@@ -201,7 +204,10 @@ function Nav({
 }
 
 export default function Home() {
-  const [view, setView] = useState<View>('agent');
+  const [view, setView] = useState<View>('home');
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [view]);
   const [profile, setProfile] = useState(initialProfile);
   const [draft, setDraft] = useState(initialProfile);
   const [spec, setSpec] = useState(initialSpec);
@@ -488,6 +494,9 @@ export default function Home() {
           </div>
         </header>
         <div className="page-content">
+          {view === 'home' && (
+            <AgencyIntro onSearch={() => setView('agent')} onProfile={() => setView('agency')} onBalance={() => setView('plan')} />
+          )}
           {view === 'agent' && (
             <div className="agent-home">
               <section
