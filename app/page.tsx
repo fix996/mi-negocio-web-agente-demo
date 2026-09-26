@@ -73,7 +73,7 @@ import {
   type SearchSpec,
 } from '@/lib/prospecto';
 
-import { PLAN, ars, availableSearches, validTopUp, spendSearch, type WalletState } from '@/lib/plan';
+import { PLAN, ars, availableSearches, searchBudget, searchPrice, introductorySearchesLeft, restoreWallet, validTopUp, spendSearch, type WalletState } from '@/lib/plan';
 import { AgencyIntro } from '@/components/agency-intro';
 
 type View = 'home' | 'agent' | 'leads' | 'history' | 'agency' | 'plan';
@@ -114,6 +114,7 @@ function Nav({
   go,
   profile,
   balance,
+  completedSearches,
   saved,
   showAccess,
 }: {
@@ -121,6 +122,7 @@ function Nav({
   go: (v: View) => void;
   profile: Profile;
   balance: number;
+  completedSearches: number;
   saved: number;
   showAccess: () => void;
 }) {
@@ -185,7 +187,7 @@ function Nav({
             Mi saldo de prueba <ChevronRight size={14} />
           </span>
           <strong>
-            {ars(balance)} <small>{availableSearches(balance)} búsquedas disponibles</small>
+            {ars(balance)} <small>{availableSearches(balance, completedSearches)} búsquedas disponibles</small>
           </strong>
         </button>
         <button className="user-menu" onClick={showAccess}>
@@ -215,7 +217,7 @@ export default function Home() {
   const [showResults, setShowResults] = useState(false);
   const [runs, setRuns] = useState<Run[]>([]);
   const [saved, setSaved] = useState<string[]>([]);
-  const [wallet, setWallet] = useState<WalletState>({ balance: PLAN.demoBalance, spent: 0 });
+  const [wallet, setWallet] = useState<WalletState>({ balance: PLAN.demoBalance, spent: 0, completedSearches: 0 });
   const [topUpInput, setTopUpInput] = useState('30000');
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -227,8 +229,11 @@ export default function Home() {
   const [access, setAccess] = useState(false);
   const runLock = useRef(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const remaining = availableSearches(wallet.balance);
+  const remaining = availableSearches(wallet.balance, wallet.completedSearches);
+  const nextSearchPrice = searchPrice(wallet.completedSearches);
+  const introLeft = introductorySearchesLeft(wallet.completedSearches);
   const topUpAmount = Number(topUpInput);
+  const afterTopUp = searchBudget(wallet.balance + topUpAmount, wallet.completedSearches);
   const allLeads = runs.flatMap((r) => r.leads);
   const currentRun = runs.find((r) => r.id === activeRun) ?? runs[0];
   const shown = currentRun?.leads ?? [];
@@ -280,9 +285,8 @@ export default function Home() {
         if (Array.isArray(d.saved))
           setSaved(d.saved.filter((s: unknown) => typeof s === 'string'));
         // Only a validated prepaid wallet is restored; old monthly quotas do not become money.
-        if (d.wallet && Number.isSafeInteger(d.wallet.balance) && d.wallet.balance >= 0 && d.wallet.balance <= PLAN.maxBalance && Number.isSafeInteger(d.wallet.spent) && d.wallet.spent >= 0) {
-          setWallet(d.wallet);
-        }
+        const restoredWallet = restoreWallet(d.wallet);
+        if (restoredWallet) setWallet(restoredWallet);
       }
     } catch {
       /* Demo remains usable without storage. */
@@ -347,7 +351,7 @@ export default function Home() {
         setRuns((r) => [run, ...r].slice(0, 30));
         setActiveRun(id);
         setWallet((current) => spendSearch(current));
-        setNotice('Búsqueda de ejemplo completada. Se descontaron ' + ars(PLAN.searchArs) + ' del saldo de prueba.');
+        setNotice('Búsqueda de ejemplo completada. Se descontaron ' + ars(nextSearchPrice) + ' del saldo de prueba.');
         setBusy(false);
         runLock.current = false;
       }
@@ -462,6 +466,7 @@ export default function Home() {
         go={setView}
         profile={profile}
         balance={wallet.balance}
+        completedSearches={wallet.completedSearches}
         saved={saved.length}
         showAccess={() => setAccess(true)}
       />
@@ -655,7 +660,7 @@ export default function Home() {
                     <Building2 size={13} />
                     {profile.name}
                   </span>
-                  <button className="balance-inline" onClick={() => setView('plan')}>{ars(PLAN.searchArs)} por búsqueda · Saldo: {ars(wallet.balance)}</button>
+                  <button className="balance-inline" onClick={() => setView('plan')}>Próxima búsqueda: {ars(nextSearchPrice)} · Saldo: {ars(wallet.balance)}{introLeft > 0 ? ' · Tarifa inicial (' + introLeft + ' restantes); después ' + ars(PLAN.searchArs) : ''}</button>
                 </div>
                 {remaining < 1 && !busy && <button className="text-btn refill-link" onClick={() => setView('plan')}>Recargar saldo de prueba <ArrowRight size={14} /></button>}
                 {busy && (
@@ -997,28 +1002,32 @@ export default function Home() {
                   <div className="pricing-top"><span className="small-pill">SALDO DE PRUEBA</span><Wallet size={24} /></div>
                   <div className="price">{ars(wallet.balance)} <span>ARS</span></div>
                   <p>Disponible para <strong>{remaining} búsquedas</strong>.</p>
-                  <div className="wallet-rate"><span>Una búsqueda</span><strong>{ars(PLAN.searchArs)} ARS</strong></div>
+                  <div className="wallet-rate"><span>Tu próxima búsqueda</span><strong>{ars(nextSearchPrice)} ARS</strong></div>
+                  <p>{introLeft > 0 ? <>Te quedan <strong>{introLeft} búsquedas a {ars(PLAN.introSearchArs)} cada una</strong>. Después, {ars(PLAN.searchArs)} por búsqueda.</> : <>Ya usaste las {PLAN.introSearches} búsquedas iniciales. Tu tarifa es {ars(PLAN.searchArs)} por búsqueda.</>}</p>
                   <p>Hasta {PLAN.maxBusinesses} negocios por búsqueda. Recomendamos empezar con {PLAN.recommendedBusinesses}.</p>
                   <form className="recharge-form" onSubmit={topUp}>
                     <label htmlFor="top-up">¿Cuánto querés recargar?</label>
                     <div className="amount-input"><span>ARS</span><input id="top-up" type="number" min={PLAN.minTopUp} max={PLAN.maxBalance} step={1} value={topUpInput} onChange={(e) => setTopUpInput(e.target.value)} required disabled={busy || !ready} /></div>
                     <div className="amount-options">
-                      {[15000, 30000, 100000].map((amount) => <button type="button" key={amount} aria-pressed={topUpAmount === amount} onClick={() => setTopUpInput(String(amount))} disabled={busy}>{ars(amount)}</button>)}
+                      {[10000, 25000, 100000].map((amount) => <button type="button" key={amount} aria-pressed={topUpAmount === amount} onClick={() => setTopUpInput(String(amount))} disabled={busy}>{ars(amount)}</button>)}
                     </div>
-                    <p className="recharge-preview" aria-live="polite">{validTopUp(topUpAmount, wallet.balance) ? <><strong>{availableSearches(topUpAmount)} búsquedas</strong> con esta recarga{topUpAmount % PLAN.searchArs ? ' + ' + ars(topUpAmount % PLAN.searchArs) + ' de saldo restante' : ''}.</> : 'Ingresá un importe válido desde ' + ars(PLAN.minTopUp) + '.'}</p>
+                    <p className="recharge-preview" aria-live="polite">{validTopUp(topUpAmount, wallet.balance) ? <>Con tu saldo actual y esta recarga tendrás <strong>{afterTopUp.count} búsquedas disponibles</strong>{afterTopUp.remainder ? ' + ' + ars(afterTopUp.remainder) + ' de saldo restante' : ''}.</> : 'Ingresá un importe válido desde ' + ars(PLAN.minTopUp) + '.'}</p>
                     <button className="primary full" disabled={!ready || busy || !validTopUp(topUpAmount, wallet.balance)}><CreditCard size={17} /> Simular recarga</button>
                   </form>
                   <p className="price-note">Solo dinero ficticio. No se solicita ni procesa ningún pago.</p>
                 </section>
                 <section className="surface plan-explainer">
-                  <h2>Una búsqueda, un precio claro.</h2>
-                  <p>Elegís el rubro, la zona y entre 1 y {PLAN.maxBusinesses} negocios. Cada búsqueda completada con resultados cuesta <strong>{ars(PLAN.searchArs)}</strong>, independientemente de la cantidad elegida.</p>
+                  <h2>Empezá con una tarifa especial.</h2>
+                  <p>Tus primeras <strong>{PLAN.introSearches} búsquedas a {ars(PLAN.introSearchArs)} cada una</strong> ({ars(PLAN.introSearches * PLAN.introSearchArs)} las tres). Desde la cuarta, <strong>{ars(PLAN.searchArs)} por búsqueda</strong>.</p>
+                  <p>Elegís el rubro, la zona y entre 1 y {PLAN.maxBusinesses} negocios. El precio es por búsqueda completada con resultados, independientemente de la cantidad elegida.</p>
+                  <p className="muted-note">Ejemplos al empezar, con las tres búsquedas iniciales disponibles:</p>
                   <div className="recharge-examples">
-                    {[30000, 100000].map((amount) => <div key={amount}><span>{ars(amount)}</span><strong>{availableSearches(amount)} búsquedas</strong><small>Hasta {availableSearches(amount) * PLAN.maxBusinesses} resultados en total{amount % PLAN.searchArs ? ' · ' + ars(amount % PLAN.searchArs) + ' de saldo restante' : ''}</small></div>)}
+                    {[30000, 105000].map((amount) => <div key={amount}><span>{ars(amount)}</span><strong>{availableSearches(amount, 0)} búsquedas</strong><small>Hasta {availableSearches(amount, 0) * PLAN.maxBusinesses} resultados en total</small></div>)}
                   </div>
                   <h2>Empezá con {PLAN.recommendedBusinesses} negocios.</h2>
                   <p>Es una cantidad práctica para revisar cada oportunidad. Pedir más puede incluir coincidencias menos ajustadas; hacer más búsquedas no reduce por sí solo la calidad.</p>
                   <ul className="wallet-rules">
+                    <li><Check size={15} />La tarifa inicial se usa una sola vez. No se renueva al recargar ni al cambiar el mes.</li>
                     <li><Check size={15} />El saldo no vence al terminar el mes.</li>
                     <li><Check size={15} />Si la búsqueda falla o no encuentra negocios, no se descuenta saldo.</li>
                     <li><Check size={15} />Revisar fichas y guardar leads no tiene costo.</li>

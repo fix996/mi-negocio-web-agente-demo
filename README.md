@@ -16,10 +16,12 @@ Dashboard para presentar a agencias web un servicio de búsqueda de oportunidade
 
 ## Propuesta prepaga
 
-Una búsqueda completada con resultados cuesta **ARS 5.000**, independientemente de la cantidad elegida (hasta 25 negocios). Reemplaza la propuesta anterior de abono mensual y configuración separada. La recarga mínima es de ARS 5.000.
+Las **primeras tres búsquedas cuestan ARS 10.000 cada una** (ARS 30.000 las tres). **Desde la cuarta, ARS 25.000 por búsqueda**, independientemente de la cantidad elegida (hasta 25 negocios). La recarga mínima es de ARS 10.000.
 
-- ARS 30.000 = 6 búsquedas, hasta 150 resultados en total.
-- ARS 100.000 = 20 búsquedas, hasta 500 resultados en total.
+- Al empezar: ARS 30.000 = 3 búsquedas, hasta 75 resultados en total.
+- Al empezar: ARS 105.000 = 6 búsquedas (3 iniciales + 3 regulares), hasta 150 resultados en total.
+- Al empezar: ARS 100.000 = 5 búsquedas y ARS 20.000 restantes. Después de la promoción: ARS 100.000 = 4 búsquedas.
+- La tarifa inicial se aplica una sola vez; no se reinicia al recargar o cambiar el mes. Un contador independiente del historial conserva cuántas búsquedas se completaron con esta tarifa.
 - Sin abono mensual; el saldo se conserva al cambiar el mes.
 - Recarga asistida: en el futuro servicio, MI NEGOCIO WEB acredita el saldo tras confirmar el pago.
 - Se propone no descontar búsquedas fallidas o sin resultados. Si hay menos negocios que los pedidos, una búsqueda con resultados consume el precio completo. Revisar y guardar fichas no consume saldo.
@@ -29,7 +31,7 @@ Una búsqueda completada con resultados cuesta **ARS 5.000**, independientemente
 
 Los negocios, puntuaciones, contactos y dinero son ficticios. Los correos usan el dominio reservado .example y no sirven para contactar negocios reales. **No hay IA, búsqueda en internet, autenticación, pagos ni mensajes salientes.** No ingresar datos sensibles.
 
-El saldo inicial de ARS 30.000 permite probar la experiencia; el botón «Simular recarga» no cobra. Todos los cambios se guardan en este navegador. Se conservan los perfiles anteriores y se reemplaza el cupo mensual por una billetera de prueba independiente. Los límites locales no constituyen controles de facturación.
+El saldo inicial de ARS 30.000 permite probar las tres búsquedas iniciales; el botón «Simular recarga» no cobra. Todos los cambios se guardan en este navegador. Las billeteras de la versión anterior conservan saldo y gasto acumulado y comienzan la nueva promoción con contador cero; las nuevas billeteras conservan el contador entre sesiones. Los límites locales no constituyen controles de facturación por cuenta real.
 
 Antes del servicio real faltan cuentas privadas, backend, acreditación administrativa, registro de pagos, separación entre agencias, control de gastos, fuentes verificadas y medición de calidad y costos.
 

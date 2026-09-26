@@ -45,7 +45,7 @@ export function AgencyIntro({ onSearch, onProfile, onBalance }: {
       </div>
 
       <div className="intro-bottom">
-        <div><h2>Vos elegís cuándo buscar.</h2><p>Propuesta prepaga: {ars(PLAN.searchArs)} por búsqueda, hasta {PLAN.maxBusinesses} negocios. Empezá con {PLAN.recommendedBusinesses} para revisar las oportunidades con calma.</p><button className="text-btn" onClick={onBalance}>Ver cómo funcionan las recargas <ArrowRight size={15} /></button></div>
+        <div><h2>Vos elegís cuándo buscar.</h2><p>Tus primeras {PLAN.introSearches} búsquedas a <strong>{ars(PLAN.introSearchArs)} cada una</strong>. Desde la cuarta, <strong>{ars(PLAN.searchArs)} por búsqueda</strong>. Hasta {PLAN.maxBusinesses} negocios por búsqueda; recomendamos empezar con {PLAN.recommendedBusinesses}. Sin abono mensual.</p><button className="text-btn" onClick={onBalance}>Ver cómo funcionan las recargas <ArrowRight size={15} /></button></div>
         <div className="intro-status"><span className="small-pill">ESTÁS EXPLORANDO UNA DEMO</span><p>Podés probar el recorrido con negocios, contactos y saldo ficticios. La búsqueda real con IA y las cuentas privadas todavía no están conectadas.</p></div>
       </div>
     </section>
