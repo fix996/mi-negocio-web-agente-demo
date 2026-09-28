@@ -15,10 +15,10 @@ export function AgencyIntro({ onSearch, onProfile, onBalance }: {
           <p className="intro-lead">Tu propio agente de IA privado, especializado en encontrar leads para tu agencia.</p>
           <p className="intro-purpose">Pensado para detectar negocios que podrían necesitar una página web o mejorar la que ya tienen. Configurado según tus servicios, tu cliente ideal y la zona donde querés conseguir clientes.</p>
           <div className="intro-actions">
-            <button className="primary" onClick={onSearch}>Probar mi agente <ArrowRight size={17} /></button>
-            <button className="text-btn" onClick={onProfile}>Personalizar mi agencia <SlidersHorizontal size={15} /></button>
+            <button className="primary" onClick={onSearch}>Probar la demo <ArrowRight size={17} /></button>
+            <button className="text-btn" onClick={onBalance}>Ver precios <ArrowRight size={15} /></button>
           </div>
-          <p className="intro-demo-label">Demo interactiva · Sin registro ni pagos</p>
+          <p className="intro-demo-label">Demo interactiva · Datos ficticios · Sin pagos</p><div className="intro-offer"><div><span>Activación · única vez</span><strong>{ars(PLAN.activationArs)}</strong><small>Configuración + 3 búsquedas incluidas</small></div><div><span>Después, cuando necesites</span><strong>{ars(PLAN.searchArs)}</strong><small>por búsqueda adicional · Sin abono</small></div></div>
         </div>
         <aside className="intro-sample" aria-label="Ejemplo ficticio de oportunidad comercial">
           <div className="sample-topline"><Target size={18} /><span>UNA OPORTUNIDAD, CON CONTEXTO</span></div>
@@ -40,12 +40,12 @@ export function AgencyIntro({ onSearch, onProfile, onBalance }: {
       </section>
 
       <div className="intro-service-notes">
-        <div><LockKeyhole size={18} /><p><strong>Tu agente. Tu espacio privado.</strong><span>El servicio prevé una cuenta con acceso exclusivo para tu agencia, con su propio agente, preferencias e historial.</span></p></div>
+        <div><LockKeyhole size={18} /><p><strong>Tu agente. Tu espacio privado.</strong><span>Una sola plataforma, con una cuenta privada para cada agencia. Ingresarías con tu correo y contraseña para ver únicamente tu agente, saldo y resultados.</span></p></div>
         <div><MapPin size={18} /><p><strong>Pensado para buscar en toda Argentina</strong><span>Vos elegís la zona. La cantidad y calidad dependen de la información disponible.</span></p></div>
       </div>
 
       <div className="intro-bottom">
-        <div><h2>Vos elegís cuándo buscar.</h2><p>Tus primeras {PLAN.introSearches} búsquedas a <strong>{ars(PLAN.introSearchArs)} cada una</strong>. Desde la cuarta, <strong>{ars(PLAN.searchArs)} por búsqueda</strong>. Hasta {PLAN.maxBusinesses} negocios por búsqueda; recomendamos empezar con {PLAN.recommendedBusinesses}. Sin abono mensual.</p><button className="text-btn" onClick={onBalance}>Ver cómo funcionan las recargas <ArrowRight size={15} /></button></div>
+        <div><h2>Una activación. Después, vos elegís.</h2><p><strong>{ars(PLAN.activationArs)} por única vez</strong> para activar y configurar tu espacio, con <strong>{PLAN.includedSearches} búsquedas incluidas</strong>. Luego, <strong>{ars(PLAN.searchArs)} por búsqueda adicional</strong>, sin mensualidad. Hasta {PLAN.maxBusinesses} negocios por búsqueda, según disponibilidad.</p><p>Para recargar elegirías el importe en tu cuenta y nos contactarías por WhatsApp. Al confirmar el pago, acreditamos el saldo.</p><button className="text-btn" onClick={onBalance}>Ver precios y probar una recarga <ArrowRight size={15} /></button><button className="text-btn" onClick={onProfile}>Configurar mi agencia de ejemplo <SlidersHorizontal size={15} /></button></div>
         <div className="intro-status"><span className="small-pill">ESTÁS EXPLORANDO UNA DEMO</span><p>Podés probar el recorrido con negocios, contactos y saldo ficticios. La búsqueda real con IA y las cuentas privadas todavía no están conectadas.</p></div>
       </div>
     </section>
