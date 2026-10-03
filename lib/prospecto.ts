@@ -12,7 +12,9 @@ export type Lead = {
   social: string;
   offer: string;
 };
-export function validSearch(s: SearchSpec): boolean {
+export function validSearch(value: unknown): value is SearchSpec {
+  if (!value || typeof value !== 'object') return false;
+  const s = value as SearchSpec;
   return (
     typeof s.industry === 'string' &&
     s.industry.trim().length > 0 &&
@@ -78,6 +80,12 @@ export function createLeads(spec: SearchSpec, runId: string): Lead[] {
 
 /** Reserved .example domain: never invent a real phone or business identity in a demo. */
 export function demoContact(lead: Pick<Lead, 'name'>): string {
-  const slug = lead.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'negocio';
+  const slug =
+    lead.name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'negocio';
   return 'contacto@' + slug + '.example';
 }

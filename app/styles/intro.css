@@ -1,0 +1,372 @@
+.agency-intro {
+  max-width: 1110px;
+  margin: 0 auto;
+  padding: 20px 0 32px;
+}
+.intro-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #7e6840;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+}
+.intro-eyebrow > span {
+  width: 5px;
+  height: 5px;
+  background: #b1945b;
+  border-radius: 50%;
+}
+.intro-hero {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: clamp(26px, 4vw, 64px);
+  align-items: center;
+  margin: 33px 0 64px;
+}
+.intro-copy h1 {
+  font-size: clamp(33px, 3.2vw, 48px);
+  line-height: 1.13;
+  letter-spacing: -1.8px;
+  font-weight: 500;
+  text-wrap: balance;
+}
+.intro-copy h1 span {
+  color: #7c6435;
+}
+.intro-lead {
+  font-size: 17px;
+  line-height: 1.75;
+  color: #62605a;
+  margin-top: 24px;
+  max-width: 520px;
+}
+.intro-purpose {
+  font-size: 13px;
+  line-height: 1.85;
+  color: #706a5f;
+  max-width: 470px;
+  margin-top: 13px;
+}
+.intro-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px 22px;
+  margin-top: 27px;
+}
+.intro-actions .primary {
+  padding: 13px 18px;
+  font-size: 13px;
+}
+.intro-actions .text-btn {
+  font-size: 12px;
+  margin: 0;
+}
+.intro-demo-label {
+  font-size: 11px;
+  color: #6c6760;
+  margin-top: 14px;
+}
+.intro-sample {
+  padding: 26px;
+  background: #191917;
+  border: 1px solid #33312b;
+  border-radius: 15px;
+  color: #f7f4ed;
+}
+.sample-topline {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #c7ab74;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  line-height: 1.7;
+}
+.sample-business {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  margin: 27px 0;
+}
+.sample-icon {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  border: 1px solid #524833;
+  border-radius: 10px;
+  color: #c8b186;
+}
+.sample-business h2 {
+  font-size: 23px;
+  font-weight: 450;
+  letter-spacing: -0.5px;
+}
+.sample-business p {
+  font-size: 12px;
+  color: #a49e91;
+  margin-top: 3px;
+}
+.sample-detail {
+  border-top: 1px solid #35332c;
+  padding-top: 15px;
+  margin-top: 16px;
+}
+.sample-detail > span {
+  font-size: 11px;
+  color: #c6b17f;
+}
+.sample-detail p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #ccc7bc;
+  margin-top: 6px;
+}
+.sample-contact {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 23px;
+  color: #c5b78f;
+  font-size: 10px;
+  line-height: 1.7;
+}
+.sample-disclaimer {
+  color: #938e83;
+  font-size: 10px;
+  line-height: 1.75;
+  margin-top: 11px;
+}
+.intro-workflow {
+  border-top: 1px solid #e8e5dd;
+  padding-top: 31px;
+}
+.intro-section-heading > span {
+  font-size: 9px;
+  letter-spacing: 1.3px;
+  color: #79694d;
+}
+.intro-section-heading h2 {
+  font-size: 23px;
+  line-height: 1.5;
+  font-weight: 450;
+  letter-spacing: -0.55px;
+  margin-top: 9px;
+}
+.intro-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 32px;
+}
+.intro-step-number {
+  font-size: 12px;
+  color: #7a6642;
+}
+.intro-steps h3 {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 12px 0 9px;
+}
+.intro-steps p {
+  font-size: 13px;
+  line-height: 1.9;
+  color: #6e685d;
+}
+.intro-service-notes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  padding: 26px 0;
+  margin-top: 34px;
+  border-block: 1px solid #e8e5dd;
+}
+.intro-service-notes > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+}
+.intro-service-notes svg {
+  margin-top: 3px;
+  color: #7f693d;
+}
+.intro-service-notes p {
+  display: grid;
+  gap: 6px;
+}
+.intro-service-notes strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+.intro-service-notes span {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #70685b;
+}
+.intro-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  padding-top: 31px;
+}
+.intro-bottom h2 {
+  font-size: 19px;
+  font-weight: 450;
+  letter-spacing: -0.3px;
+}
+.intro-bottom p {
+  font-size: 12px;
+  color: #726858;
+  line-height: 1.9;
+  margin-top: 12px;
+}
+.intro-bottom .text-btn {
+  margin-top: 14px;
+  font-size: 12px;
+}
+.intro-status {
+  border-left: 1px solid #e8e5dd;
+  padding-left: 26px;
+}
+.intro-status .small-pill {
+  font-size: 9px;
+  letter-spacing: 0.8px;
+}
+.intro-offer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  border-top: 1px solid #e8e1d4;
+  margin-top: 24px;
+  padding-top: 20px;
+}
+.intro-offer > div {
+  display: grid;
+  gap: 6px;
+}
+.intro-offer span {
+  color: #726652;
+  font-size: 11px;
+}
+.intro-offer strong {
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: -0.8px;
+}
+.intro-offer small {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #726652;
+}
+@media (max-width: 1050px) {
+  .intro-hero {
+    grid-template-columns: 1fr;
+  }
+  .intro-copy {
+    max-width: 620px;
+  }
+  .intro-copy h1 {
+    font-size: 40px;
+  }
+  .intro-sample {
+    max-width: 620px;
+  }
+  .intro-steps {
+    gap: 22px;
+  }
+}
+@media (max-width: 767px) {
+  .agency-intro {
+    padding: 15px 0 20px;
+    padding-top: 8px;
+  }
+  .intro-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.9px;
+  }
+  .intro-hero {
+    margin-bottom: 38px;
+    margin-top: 20px;
+    gap: 26px;
+  }
+  .intro-copy h1 {
+    letter-spacing: -1.25px;
+    font-size: clamp(28px, 8vw, 36px);
+    line-height: 1.12;
+  }
+  .intro-break {
+    display: none;
+  }
+  .intro-lead {
+    font-size: 15px;
+    margin-top: 17px;
+    line-height: 1.6;
+  }
+  .intro-purpose {
+    font-size: 13px;
+    line-height: 1.65;
+    margin-top: 10px;
+  }
+  .intro-actions {
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .intro-sample {
+    padding: 20px;
+  }
+  .intro-section-heading h2 {
+    font-size: 21px;
+  }
+  .intro-steps {
+    grid-template-columns: 1fr;
+    margin-top: 25px;
+    gap: 16px;
+  }
+  .intro-steps h3 {
+    margin-top: 8px;
+  }
+  .intro-service-notes,
+  .intro-bottom {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .intro-status {
+    border-left: 0;
+    border-top: 1px solid #e8e5dd;
+    padding: 24px 0 0;
+  }
+  .intro-actions .primary {
+    min-height: 46px;
+  }
+  .intro-demo-label {
+    font-size: 11px;
+    margin-top: 12px;
+  }
+  .intro-offer {
+    gap: 14px;
+    margin-top: 20px;
+    padding-top: 17px;
+  }
+  .intro-offer strong {
+    font-size: 25px;
+  }
+  .sample-business {
+    margin-block: 20px;
+  }
+  .intro-steps article {
+    padding: 16px;
+    background: #faf8f4;
+    border-radius: 12px;
+  }
+  .intro-steps p {
+    line-height: 1.7;
+  }
+  .intro-bottom {
+    gap: 24px;
+  }
+}

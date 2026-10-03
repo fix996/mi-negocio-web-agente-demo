@@ -39,6 +39,35 @@ Antes del servicio real faltan cuentas privadas, backend, acreditación administ
 
 ## Desarrollo y publicación
 
-Node.js 22.13 o posterior. Ejecutar npm ci, npm run dev o npm run build.
+Node.js 22.13 o posterior.
 
-La compilación genera docs/. GitHub Pages publica desde main, carpeta /docs. No contiene claves ni credenciales. La tipografía Geist incluye su licencia en public/fonts/OFL.txt.
+```sh
+npm ci
+npm run dev
+npm run check
+```
+
+`npm run check` comprueba formato, ejecuta las pruebas, verifica tipos, compila y revisa el contenido público. Incluye presupuestos de 100 KB gzip de JavaScript y 10 KB gzip de CSS (medición local), y búsqueda de patrones comunes de secretos. Esta búsqueda no reemplaza una revisión de seguridad ni inspecciona todo el historial Git.
+
+`npm run format` aplica el formato acordado. `npm run preview` sirve el build local. Después de cambios de interfaz también se debe revisar escritorio y celular en navegador; esa revisión no la reemplaza la compilación.
+
+## Organización del código
+
+| Ubicación | Responsabilidad |
+| --- | --- |
+| `app/page.tsx` | Componer el dashboard y su navegación |
+| `components/views/` | Buscador, leads, historial, agencia y saldo |
+| `components/lead-dialog.tsx` | Ficha accesible y copia del contacto de ejemplo |
+| `hooks/use-demo.ts` | Coordinar la simulación y el estado de la demo |
+| `lib/plan.ts` | Precios, límites y reglas del saldo ficticio |
+| `lib/demo-storage.ts` | Validar y recuperar los datos locales |
+| `lib/search-query.ts` | Interpretar la consulta de ejemplo, sin IA |
+| `app/styles/` | Estilos organizados por pantalla y elementos compartidos |
+
+Se retiraron los componentes de biblioteca sin uso y la pantalla de acceso simulado. Se usan HTML semántico, un selector nativo y un diálogo modal nativo con cierre por Escape y recuperación del foco. Los datos locales se validan antes de mostrarlos y se conserva el formato anterior de la demo.
+
+Las instrucciones de mantenimiento están en `AGENTS.md`. El flujo de GitHub Actions ejecuta los controles en pushes y pull requests; no sustituye la comprobación previa a publicar ni una protección de rama.
+
+La compilación genera `docs/`. GitHub Pages publica desde `main`, carpeta `/docs`. Esta demo no requiere claves ni credenciales. La tipografía Geist incluye su licencia en `public/fonts/OFL.txt`.
+
+El código frontend es público por naturaleza. `.gitignore` evita versionar determinados archivos; no protege rutas, cuentas ni información que se envía al navegador. Cambiar nombres de archivos, minificarlos o separar componentes no convierte esta demo en un servicio privado.
